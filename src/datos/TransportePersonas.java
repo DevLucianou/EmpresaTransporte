@@ -1,90 +1,86 @@
-
 package datos;
 
 import entradaDatos.Consola;
-import java.io.RandomAccessFile;
-import persistencia.*;
 import java.io.*;
 
-
-public class TransportePersonas extends Transporte implements Grabable, ICalculable{
-    //atributos
+public class TransportePersonas extends Transporte {
+    // atributos
     public int cantPasajeros;
-    
-    
-    private static final int TAMARCHIVO = 100; // cantidad de registros que tendra el archivo
-    private static final int TAMAREG = 64; //a confirmar 
-    
-    //constructor
-    public TransportePersonas(){
-        
+
+    private static final int TAM_REG = 26;
+
+    // constructor
+    public TransportePersonas() {
+        cantPasajeros = 0;
+        codT = 0;
+        tipo = 'P';
+        horas = 0;
+        dniConductor = 0;
     }
-    
-    public TransportePersonas(int codet, char tipo, int horas, int dniAsociado, int cantPasajeros){     
-        this.codet = codet;
+
+    public TransportePersonas(int codT, char tipo, int horas, int dniConductor, int cantPasajeros) {
+        this.codT = codT;
         this.tipo = tipo;
         this.horas = horas;
-        this.dniAsociado = dniAsociado;
+        this.dniConductor = dniConductor;
         this.cantPasajeros = cantPasajeros;
     }
-    
-    //getters y setters
-    public int getCantPasajeros(){
+
+    // getters y setters
+    public int getCantPasajeros() {
         return cantPasajeros;
     }
-    
-    public void setCantPasajeros(int cantPasajeros){
+
+    public void setCantPasajeros(int cantPasajeros) {
         this.cantPasajeros = cantPasajeros;
     }
-    
-    //metodos
-    
-    private void leerCantPasajeros(){
-       Consola.emitirMensajeLN("Ingrese la cantidad de personas que transporta: ");
-       int cantp;
-       do{
-           cantp = Consola.leerInt();
-           if(cantp <= 0){
-               Consola.emitirMensajeLN("ERROR, la cantidad de personas que transporta no puede ser menor o igual que 0, ingrese de nuevo: ");
-           }
-       }while(cantp <= 0);
-       setCantPasajeros(cantp);
+
+    // metodos
+
+    private void leerCantPasajeros() {
+        Consola.emitirMensaje("Ingrese la cantidad de personas que transporta: ");
+        int cantp;
+        do {
+            cantp = Consola.leerInt();
+            if (cantp <= 0) {
+                Consola.emitirMensajeLN(
+                        "[ERROR] La cantidad de personas que transporta no puede ser menor o igual que 0");
+            }
+        } while (cantp <= 0);
+        setCantPasajeros(cantp);
     }
 
     @Override
     public void cargarDatos() {
-        Consola.emitirMensajeLN("-- CARGANDO INFORMACION DEL TRANSPORTE DE PERSONAS --");
         super.cargarDatos();
         leerCantPasajeros();
-        Consola.emitirMensajeLN("-----------------------------------------------------");
     }
 
     @Override
     public String toString() {
-        //codear
-        return"";
-        }
-    
-    @Override
-    public int tamRegistro() {
-       return TAMAREG;
-    }
-
-    @Override
-    public int tamArchivo() {
-        return TAMARCHIVO;
+        // codear
+        return "Transporte de personas - Codigo: " + codT + ", Tipo: " + tipo + ", Horas: " + horas
+                + ", DNI Conductor: " + dniConductor + ", Cantidad de pasajeros: " + cantPasajeros + ", Extra: "
+                + extra;
     }
 
     @Override
     public void grabar(RandomAccessFile a) {
         try {
-            a.writeInt(codet);
+            a.writeInt(codT);
             a.writeChar(tipo);
             a.writeInt(horas);
-            a.writeInt(dniAsociado);
+            a.writeInt(dniConductor);
+            a.writeDouble(extra);
             a.writeInt(cantPasajeros);
-            // el metodo es estatico se convoca con el nombre de la clase
-            
+            int resto = TAM_REGISTRO_TOTAL - TAM_REG;
+            if (resto != 0) {
+                while (resto > 0) {
+                    a.write(0);
+                    resto--;
+                }
+            }
+
         } catch (IOException e) {
             System.out.println("Error al grabar el registro: " + e.getMessage());
             System.exit(1);
@@ -93,14 +89,22 @@ public class TransportePersonas extends Transporte implements Grabable, ICalcula
 
     @Override
     public void leer(RandomAccessFile a, int val) {
-         try {
-            if(val == 0)
-                codet= a.readInt();
-               tipo = a.readChar();
-               horas = a.readInt();
-               dniAsociado = a.readInt();
-               cantPasajeros = a.readInt();
-         
+        try {
+            if (val == 0)
+                codT = a.readInt();
+            tipo = a.readChar();
+            horas = a.readInt();
+            dniConductor = a.readInt();
+            extra = a.readDouble();
+            cantPasajeros = a.readInt();
+            int resto = TAM_REGISTRO_TOTAL - TAM_REG;
+            if (resto != 0) {
+                while (resto > 0) {
+                    a.read();
+                    resto--;
+                }
+            }
+
         } catch (IOException e) {
             System.out.println("Error al leer el registro: " + e.getMessage());
             System.exit(1);
@@ -109,18 +113,24 @@ public class TransportePersonas extends Transporte implements Grabable, ICalcula
 
     @Override
     public void mostrarRegistro(int val, boolean activo) {
-       //codear
+        // codear
     }
 
-       //grabable
+    // grabable
     @Override
     public void cargarDatos(int val) {
-       //codear
+        // codear
     }
 
     @Override
-    public float calcularExtra() {
-        //codear
-        return 1;
+    public void calcularExtra() {
+        double extra = 3000;
+        if (cantPasajeros > 9) {
+            extra = 5000;
+        }
+        extra = extra * horas;
+        extra = extra + (MONTO_X_HORA * horas);
+
+        this.extra = extra;
     }
 }
