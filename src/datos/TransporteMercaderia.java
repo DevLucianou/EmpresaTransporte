@@ -1,121 +1,117 @@
-
 package datos;
 
 import entradaDatos.Consola;
 import java.io.RandomAccessFile;
-import persistencia.*;
 import java.io.*;
 
+public class TransporteMercaderia extends Transporte {
 
-public class TransporteMercaderia extends Transporte implements Grabable, ICalculable{
-    
-    //atributos
-    public int toneladasTrans;
+    // atributos
+    public double toneladasTrans;
     public boolean esPeligroso;
-    
-    private static final int TAMARCHIVO = 100; // cantidad de registros que tendra el archivo
-    private static final int TAMAREG = 64; //a confirmar 
-    
-    //constructor
-    public TransporteMercaderia(){
-        
+
+    private static final int TAM_REG = 31; // a confirmar
+
+    // constructor
+    public TransporteMercaderia() {
+        toneladasTrans = 0;
+        esPeligroso = false;
+        codT = 0;
+        tipo = 'M';
+        horas = 0;
+        dniConductor = 0;
     }
-    
-    
-    public TransporteMercaderia(int codet, char tipo, int horas, int dniAsociado, int toneladasTrans, boolean esPeligroso){
-        this.codet = codet;
+
+    public TransporteMercaderia(int codT, char tipo, int horas, int dniConductor, double toneladasTrans,
+            boolean esPeligroso) {
+        this.codT = codT;
         this.tipo = tipo;
         this.horas = horas;
-        this.dniAsociado = dniAsociado;
+        this.dniConductor = dniConductor;
         this.toneladasTrans = toneladasTrans;
         this.esPeligroso = esPeligroso;
-    } 
-    
-    //getters y setters
-    public int getToneladasTrans(){
+    }
+
+    // getters y setters
+    public double getToneladasTrans() {
         return toneladasTrans;
     }
-    
-    public void setToneladasTrans(int toneladasTrans){
+
+    public void setToneladasTrans(double toneladasTrans) {
         this.toneladasTrans = toneladasTrans;
     }
-    
-    public boolean getEsPeligroso(){
+
+    public boolean getEsPeligroso() {
         return esPeligroso;
     }
-    
+
     public void setEsPeligroso(boolean esPeligroso) {
         this.esPeligroso = esPeligroso;
     }
-    
-    //metodos 
-    
-    public void leerToneladasTrans(){
-        Consola.emitirMensajeLN("Ingrese la cantidad de toneladas transportadas: ");
-        int cantt;
-        do{
-            cantt = Consola.leerInt();
-            if(cantt <= 0) {
-                Consola.emitirMensajeLN("ERROR. la cantidad de toneladas transportadas no puede ser menor ni igual a 0, por favor ingrese de nuevo: ");
+
+    // metodos
+
+    public void leerToneladasTrans() {
+        double cantt;
+        do {
+            Consola.emitirMensaje("Ingrese la cantidad de toneladas transportadas: ");
+            cantt = Consola.leerDouble();
+            if (cantt <= 0) {
+                Consola.emitirMensajeLN("[ERROR] la cantidad de toneladas transportadas no puede ser menor ni igual a 0");
             }
-        }while(cantt <= 0);
+        } while (cantt <= 0);
         setToneladasTrans(cantt);
-    } //end leertoneladas
-    
-    public void leerEsPeligroso(){
-        Consola.emitirMensajeLN("La mercancia es peligrosa? (1 - SI | 2 - NO): ");
+    } // end leertoneladas
+
+    public void leerEsPeligroso() {
         int op;
-        do{
+        do {
+            Consola.emitirMensaje("La mercancia es peligrosa? (1 - SI | 2 - NO): ");
             op = Consola.leerInt();
-            if(op != 1 || op != 2){
-                Consola.emitirMensajeLN("ERROR, por favor seleccione una de las opciones validas (1 - SI | 2 - NO), intente de nuevo: ");
+            if (op != 1 && op != 2) {
+                Consola.emitirMensajeLN("[ERROR] Opcion no valida, debe ser: (1 - SI | 2 - NO).");
             }
-        }while(op != 1 || op != 2 );
-        if(op == 1){
+        } while (op != 1 && op != 2);
+        if (op == 1) {
             setEsPeligroso(true);
-        }
-        else {
+        } else {
             setEsPeligroso(false);
         }
-    } //end espeligroso
-    
+    } // end espeligroso
+
     @Override
-    public void cargarDatos(){
-        Consola.emitirMensajeLN("-- CARGANDO INFORMACION DEL TRANSPORTE DE PERSONAS --");
+    public void cargarDatos() {
         super.cargarDatos();
         leerToneladasTrans();
         leerEsPeligroso();
-        Consola.emitirMensajeLN("-----------------------------------------------------");
     }
 
     @Override
     public String toString() {
-       //codear
-       return "";
-    }
-
-    @Override
-    public int tamRegistro() {
-        return TAMAREG;
-    }
-
-    @Override
-    public int tamArchivo() {
-        return TAMARCHIVO; 
-   
+        // codear
+        return "Transporte de mercaderia - Codigo: " + codT + ", Tipo: " + tipo + ", Horas: " + horas
+                + ", DNI Conductor: " + dniConductor + ", Toneladas transportadas: " + toneladasTrans
+                + ", Es peligroso: " + esPeligroso + ", Extra: " + extra;
     }
 
     @Override
     public void grabar(RandomAccessFile a) {
         try {
-            a.writeInt(codet);
+            a.writeInt(codT);
             a.writeChar(tipo);
             a.writeInt(horas);
-            a.writeInt(dniAsociado);
-            a.writeInt(toneladasTrans);
+            a.writeInt(dniConductor);
+            a.writeDouble(extra);
+            a.writeDouble(toneladasTrans);
             a.writeBoolean(esPeligroso);
-            // el metodo es estatico se convoca con el nombre de la clase
-            
+
+            int resto = TAM_REGISTRO_TOTAL - TAM_REG;
+            if (resto != 0) {
+                while (resto > 0) {
+                    a.write(0);
+                    resto--;
+                }
+            }
         } catch (IOException e) {
             System.out.println("Error al grabar el registro: " + e.getMessage());
             System.exit(1);
@@ -125,14 +121,21 @@ public class TransporteMercaderia extends Transporte implements Grabable, ICalcu
     @Override
     public void leer(RandomAccessFile a, int val) {
         try {
-            if(val == 0)
-                codet= a.readInt();
-               tipo = a.readChar();
-               horas = a.readInt();
-               dniAsociado = a.readInt();
-               toneladasTrans = a.readInt();
-               esPeligroso = a.readBoolean();
-         
+            if (val == 0)
+                codT = a.readInt();
+            tipo = a.readChar();
+            horas = a.readInt();
+            dniConductor = a.readInt();
+            extra = a.readDouble();
+            toneladasTrans = a.readDouble();
+            esPeligroso = a.readBoolean();
+            int resto = TAM_REGISTRO_TOTAL - TAM_REG;
+            if (resto != 0) {
+                while (resto > 0) {
+                    a.read();
+                    resto--;
+                }
+            }
         } catch (IOException e) {
             System.out.println("Error al leer el registro: " + e.getMessage());
             System.exit(1);
@@ -141,19 +144,24 @@ public class TransporteMercaderia extends Transporte implements Grabable, ICalcu
 
     @Override
     public void mostrarRegistro(int val, boolean activo) {
-        //codear
+        // codear
     }
 
-    //grabable
+    // grabable
     @Override
     public void cargarDatos(int val) {
-        //codear
+        // codear
     }
 
     @Override
-    public float calcularExtra() {
-        //codear
-        return 1;
+    public void calcularExtra() {
+        double total = 0;
+        total += MONTO_X_HORA * horas;
+        total += toneladasTrans * 7000;
+        if (esPeligroso) {
+            total += 20000;
+        }
+        this.extra = total;
     }
-    
+
 }
