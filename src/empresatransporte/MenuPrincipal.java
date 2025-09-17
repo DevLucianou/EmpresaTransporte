@@ -153,7 +153,59 @@ public class MenuPrincipal {
 
     private void listarSueldos() {
 
-    }
+         Consola.emitirMensajeLN("-- Listados de sueldos por conductor --");
+            archC.abrirParaLectura();
+            archC.irPrincipioArchivo();
+            boolean hayConductores = false;
+
+            while(!archC.eof()){
+                Registro reg = archC.leerRegistro();
+                if(reg.getEstado()){
+                    hayConductores = true;
+                    Conductor c = (Conductor) reg.getDatos();
+                   double totalExtras = calcularTotalExtras(c);
+                   double sueldoFijo = 400000;
+                   double sueldoTotal = (double) sueldoFijo + totalExtras;
+                   Consola.emitirMensajeLN("-------------------------------");
+                   Consola.emitirMensajeLN(c.toString());
+                   Consola.emitirMensajeLN("Sueldo total: " + sueldoTotal);
+                   Consola.emitirMensajeLN("-------------------------------");
+                }
+
+            }//end while
+            if(!hayConductores){
+                Consola.emitirMensajeLN("No hay conductores registrados");
+            }
+            archC.cerrarArchivo();
+    } //end listarSueldos
+    
+    /*Funcion que devuelve el calculo de el total de extras por cada transporte asociado al conductor*/
+
+    private double calcularTotalExtras(Conductor c){
+        archTM.abrirParaLectura();
+        archTP.abrirParaLectura();
+        archTM.irPrincipioArchivo();
+        double totalExtra = 0;
+
+        while(!archTM.eof()) {
+            Registro reg = archTM.leerRegistro();
+            Transporte t = (Transporte) reg.getDatos();
+            if(reg.getEstado() && t.getDniConductor() == c.getDni()){
+                if(t.getTipo() == 'P'){
+                    archTP.buscarRegistro(reg.getNroOrden());
+                    reg = archTP.leerRegistro();
+                    t = (Transporte) reg.getDatos();
+                }
+                t.calcularExtra();
+                totalExtra += t.getExtra();
+            }
+
+        } //end while
+        archTM.cerrarArchivo();
+        archTP.cerrarArchivo();
+        return totalExtra;
+    } //end calcularTotalExtras
+    
 
     private void cargarConductor() {
         Consola.emitirMensajeLN("\n----- Cargar Conductor -----\n");
@@ -163,6 +215,7 @@ public class MenuPrincipal {
 
         boolean b = true;
         while (b) {
+            
             c.leerDni();
             archC.buscarRegistro(c.hashCode());
             Registro reg = archC.leerRegistro();

@@ -1,6 +1,7 @@
 package datos;
 
 import entradaDatos.Consola;
+import excepciones.ConductorInexistenteException;
 import java.io.*;
 
 public class TransportePersonas extends Transporte {
@@ -37,7 +38,7 @@ public class TransportePersonas extends Transporte {
 
     // metodos
 
-    private void leerCantPasajeros() {
+    public void leerCantPasajeros() {
         Consola.emitirMensaje("Ingrese la cantidad de personas que transporta: ");
         int cantp;
         do {
@@ -133,4 +134,6 @@ public class TransportePersonas extends Transporte {
 
         this.extra = extra;
     }
-}
+    
+    
+}  //end class

@@ -83,7 +83,7 @@ public class TransporteMercaderia extends Transporte {
     public void cargarDatos() {
         super.cargarDatos();
         leerToneladasTrans();
-        leerEsPeligroso();
+        leerEsPeligroso();       
     }
 
     @Override
