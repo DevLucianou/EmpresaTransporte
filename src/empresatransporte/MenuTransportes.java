@@ -21,7 +21,7 @@ public class MenuTransportes {
     }
 
     private void mostrarMenu() {
-        Consola.emitirMensajeLN("========= Menu Transportes =========");
+        Consola.emitirMensajeLN("\n========= Menu Transportes =========");
         Consola.emitirMensajeLN("1. Alta");
         Consola.emitirMensajeLN("2. Baja");
         Consola.emitirMensajeLN("3. Modificacion");
@@ -66,6 +66,7 @@ public class MenuTransportes {
                     Consola.emitirMensajeLN("Opcion incorrecta");
             }
         } while (opc != 0);
+        Consola.emitirMensajeLN("\n");
     }
 
     // CAMBIAR MANEJO DE EXCEPCIONES
@@ -146,95 +147,119 @@ public class MenuTransportes {
     
     
     private void baja(){
+        Consola.emitirMensajeLN("\n\n--------------- BAJA TRANSPORTE ---------------\n\n");
         archTM.abrirParaLeerEscribir();
-        archTP.abrirParaLeerEscribir();
+        Transporte tAux = new TransporteMercaderia();
         int op;
         
         do{
             archTM.irPrincipioArchivo();
-            Consola.emitirMensajeLN("Ingrese el codigo del Transporte a dar de baja: ");
-            long codt = Consola.leerInt();
-            archTM.buscarRegistro(codt);
-            Registro reg = archTM.leerRegistro();
-            Transporte t = (Transporte)reg.getDatos();
-            Consola.emitirMensajeLN("");
-            Consola.emitirMensajeLN("Informacion del transporte: ");
-            Consola.emitirMensajeLN("-------------------------------");
-            Consola.emitirMensajeLN(t.toString());
-            Consola.emitirMensajeLN("-------------------------------");
-            Consola.emitirMensajeLN("Confirmar baja? <1.Aceptar> <2.Cancelar>");
-            int opc = Consola.leerInt();
-            switch(opc){
-                case 1:
-                    archTM.bajaRegistro(reg);
-                    Consola.emitirMensajeLN("[Baja realizada con Exito]");
-                    break;
-                case 2:
-                    Consola.emitirMensajeLN("[Solicitud de baja cancelada]");
-                    break;
-                default:
-                    Consola.emitirMensajeLN("[ERROR] opcion invalida.");
-                    break;               
-            } //end switch
-             Consola.emitirMensajeLN("-------------------------------");
-            Consola.emitirMensajeLN("Desea continuar? (1.Si | 0.No): ");
+            tAux.leerCodT();
+
+            int nroOrd = tAux.hashCode();
+            Transporte t = buscarTransporte(nroOrd);
+
+            if(t != null){
+                Consola.emitirMensajeLN("");
+                Consola.emitirMensajeLN("Informacion del transporte: ");
+                Consola.emitirMensajeLN("-------------------------------");
+                Consola.emitirMensajeLN(t.toString());
+                Consola.emitirMensajeLN("-------------------------------");
+                Consola.emitirMensajeLN("Confirmar baja? <1.Aceptar> <2.Cancelar>");
+                int opc = Consola.leerInt();
+                switch(opc){
+                    case 1:
+                        Registro reg = new Registro(t, nroOrd);
+                        archTM.bajaRegistro(reg);
+                        Consola.emitirMensajeLN("\n[Baja realizada con Exito]");
+                        break;
+                    case 2:
+                        Consola.emitirMensajeLN("\n[Solicitud de baja cancelada]");
+                        break;
+                    default:
+                        Consola.emitirMensajeLN("\n[ERROR] opcion invalida.");
+                        break;               
+                }//end switch
+            }else{
+                Consola.emitirMensajeLN("\n[ERROR] No se encontro el transporte con codigo " + tAux.getCodT());
+            }
+
+            Consola.emitirMensajeLN("\n-------------------------------");
+            Consola.emitirMensajeLN("Desea dar de baja otro transporte? (1.Si | 0.No): ");
             op  = Consola.leerInt();
             
         }while(op != 0);
         archTM.cerrarArchivo();
-        archTP.cerrarArchivo();
+        Consola.emitirMensajeLN("\n\n-----------------------------------------------\n\n");
     } //end baja()
     
     
 
  private void modificarTransporte(){
+        Consola.emitirMensajeLN("\n\n--------------- MODIFICAR TRANSPORTE ---------------\n\n");
         char opc = 'n';
-        Archivo arch;
-        Registro reg;
+        Archivo arch = null;
         Transporte t;
+        Transporte tAux = new TransporteMercaderia();
        do{
-            Consola.emitirMensajeLN("Ingrese el codigo del Transporte para modificar:");
-        int cod = Consola.leerInt();
-        reg = buscarTransporte(cod);
-        t = (Transporte) reg.getDatos();
+            //Buscar transporte
+            Consola.emitirMensajeLN(">> Buscar transporte");
+            tAux.leerCodT();
+            int nroOrd = tAux.hashCode();
+            t = buscarTransporte(nroOrd);
         
-        char res;
-        do{
-            switch (t.getTipo()) {
-                case 'P':
-                    modificarTransportePersonas((TransportePersonas) t);
-                    arch = archTP;
-                    break;
-                case 'M':
-                    modificarTransporteMercaderia((TransporteMercaderia) t);
-                    arch = archTM;
-                    break;
-                default:
-                    break;
+            if(t != null){
+                //Segun el tipo de transporte, llamar a la funcion correspondiente
+                char continuar = 's';
+                do{
+                    switch (t.getTipo()) {
+                        case 'P':
+                            modificarTransportePersonas((TransportePersonas) t);
+                            arch = archTP;
+                            break;
+                        case 'M':
+                            modificarTransporteMercaderia((TransporteMercaderia) t);
+                            arch = archTM;
+                            break;
+                    }
+                    //preguntar si desea modificar otro campo
+                    Consola.emitirMensaje("Desea modificar otro campo? (s/n): ");
+                    continuar = Consola.leerChar();
+                }while (continuar == 's');
+
+                //Grabar cambios en el archivo
+                arch.abrirParaLeerEscribir();
+                Registro regMod = new Registro(t, nroOrd);
+                arch.grabarRegistro(regMod);
+                arch.cerrarArchivo();
+                Consola.emitirMensajeLN("[INFO] Transporte modificado con exito.");
+            }else{
+                Consola.emitirMensajeLN("[ERROR] No se encontro el transporte con codigo " + tAux.getCodT());
             }
-            Consola.emitirMensajeLN("Desea continuar? (s/n): ");
-            res = Consola.leerChar();
-        }while(res != 'n'); 
+            
         
-        Consola.emitirMensajeLN("Desea modificar otro registro? (s/n): ");
-       }while(opc != 's');
-        Registro regActualizado = new Registro(t, reg.getNroOrden());
-        arch.grabarRegistro(regActualizado);
+
+            //Preguntar si desea modificar otro transporte
+            Consola.emitirMensajeLN("Desea modificar otro transporte? (s/n): ");
+            opc = Consola.leerChar();
+       }while(opc != 'n');
+       Consola.emitirMensajeLN("\n\n-----------------------------------------------\n\n");
     } //end modificarTransporte
  
     
  
 private void modificarTransportePersonas(TransportePersonas t){
-       
-        Consola.emitirMensajeLN("--------------------------------------------");
+        Consola.emitirMensajeLN("\n--------------------------------------------");
         Consola.emitirMensajeLN("El transporte de personas seleccionado es: ");
         Consola.emitirMensajeLN(t.toString());
         Consola.emitirMensajeLN("--------------------------------------------");
+
+        
         Consola.emitirMensajeLN("");
         Consola.emitirMensajeLN("--------------------------------------------");
         Consola.emitirMensajeLN("Seleccione el campo a modificar: ");
         Consola.emitirMensajeLN("1. Cantidad de horas");
-        Consola.emitirMensaje("2. DNI del conductor asociado");
+        Consola.emitirMensajeLN("2. DNI del conductor asociado");
         Consola.emitirMensajeLN("3. Cantidad de pasajeros");
         Consola.emitirMensajeLN("0. Volver");
         Consola.emitirMensajeLN("--------------------------------------------");
@@ -245,10 +270,7 @@ private void modificarTransportePersonas(TransportePersonas t){
                 break;
             case 2:
                 try{
-                    int dni;
-                    do{
-                        dni = leerDniConductor();
-                    }while(!existeConductor(dni));      
+                    int dni = leerDniConductor();
                     t.setDniConductor(dni);
                 }catch(ConductorInexistenteException e){
                     Consola.emitirMensajeLN("[ERROR] " + e.getMessage());
@@ -267,85 +289,74 @@ private void modificarTransportePersonas(TransportePersonas t){
 
     private void modificarTransporteMercaderia(TransporteMercaderia t){
        
-        Consola.emitirMensajeLN("--------------------------------------------");
+        Consola.emitirMensajeLN("\n--------------------------------------------");
         Consola.emitirMensajeLN("El transporte de Mercaderia seleccionado es: ");
         Consola.emitirMensajeLN(t.toString());
         Consola.emitirMensajeLN("--------------------------------------------");
-        Consola.emitirMensajeLN("");
-        Consola.emitirMensajeLN("--------------------------------------------");
-        Consola.emitirMensajeLN("Seleccione el campo a modificar: ");
-        Consola.emitirMensajeLN("1. Cantidad de horas.");
-        Consola.emitirMensaje("2. DNI del conductor asociado.");
-        Consola.emitirMensajeLN("3. Toneladas Transportadas.");
-        Consola.emitirMensajeLN("4. Es peligroso.");
-        Consola.emitirMensajeLN("0. Volver");
-        Consola.emitirMensajeLN("--------------------------------------------");
-        int opc = Consola.leerInt();
-        switch(opc){
-            case 1:
-                t.leerHoras();
-                break;
-            case 2:
-                try{
-                    int dni;
-                    do{
-                        dni = leerDniConductor();
-                    }while(!existeConductor(dni));      
-                    t.setDniConductor(dni);
-                }catch(ConductorInexistenteException e){
-                    Consola.emitirMensajeLN("[ERROR] " + e.getMessage());
-                }
-                break;
-            case 3:
-                t.leerToneladasTrans();
-                break;
-            case 4:
-                t.leerEsPeligroso();
-                break;
-            case 0:
-                break;
-            default:
-                Consola.emitirMensajeLN("[ERROR] Opcion incorrecta.");
-        }
-    } //end mofidicarTransporteMercaderia
 
-    //funcion que verificar que el dni ingresado existe en los registros de los conductores.
-    //es convocada por modificarTransporteMercaderia y modificarTransportePersonas
-    private boolean existeConductor(int dnic){
-        archC.abrirParaLectura();
-        archC.irPrincipioArchivo();
-        boolean existe = false;
-        while(!archC.eof()) {
-            Registro reg = archC.leerRegistro();
-            Conductor c = (Conductor) reg.getDatos();
-            if(c.getDni() == dnic){
-                existe = true;
-            }
-        } //end while
-        archC.cerrarArchivo();
-        return existe;
-    }
-    
-    //funcion buscarTransporte
-    
-    private Registro buscarTransporte(int cod){
-        archTM.abrirParaLectura();
-        archTP.abrirParaLectura();
-        boolean hayTransportes = false;
-        Registro reg = null;
-        archTM.irPrincipioArchivo();
-        while(!archTM.eof()){
-            reg = archTM.leerRegistro();
-            Transporte t = (Transporte) reg.getDatos();
-            if(reg.getEstado() && t.getCodT() == cod){
-                hayTransportes = true;
+        
+            Consola.emitirMensajeLN("");
+            Consola.emitirMensajeLN("--------------------------------------------");
+            Consola.emitirMensajeLN("Seleccione el campo a modificar: ");
+            Consola.emitirMensajeLN("1. Cantidad de horas.");
+            Consola.emitirMensaje("2. DNI del conductor asociado.");
+            Consola.emitirMensajeLN("3. Toneladas Transportadas.");
+            Consola.emitirMensajeLN("4. Es peligroso.");
+            Consola.emitirMensajeLN("0. Volver");
+            Consola.emitirMensajeLN("--------------------------------------------");
+            int opc = Consola.leerInt();
+            switch(opc){
+                case 1:
+                    t.leerHoras();
+                    break;
+                case 2:
+                    try{
+                        int dni = leerDniConductor();   
+                        t.setDniConductor(dni);
+                    }catch(ConductorInexistenteException e){
+                        Consola.emitirMensajeLN("[ERROR] " + e.getMessage());
+                    }
+                    break;
+                case 3:
+                    t.leerToneladasTrans();
+                    break;
+                case 4:
+                    t.leerEsPeligroso();
+                    break;
+                case 0:
+                    break;
+                default:
+                    Consola.emitirMensajeLN("[ERROR] Opcion incorrecta.");
             }
             
-        } //end while
-        if(!hayTransportes) {
-            Consola.emitirMensajeLN("[ERROR] no se encontro el transporte con el codigo: " + cod);
-        }
-        return reg;
+        
+    } //end mofidicarTransporteMercaderia
+
+    
+    /**
+     * Busca un transporte por su codigo archivo de transportes.
+     * @param nroOrd Codigo del transporte a buscar.
+     * @return El transporte encontrado, o null si no se encuentra.
+     */
+    private Transporte buscarTransporte(int nroOrd){
+        archTM.abrirParaLectura();
+        archTP.abrirParaLectura();
+        Transporte encontrado = null;
+        
+        archTM.buscarRegistro(nroOrd);
+        Registro reg = archTM.leerRegistro();
+        if(reg.getEstado()) {
+            encontrado = (TransporteMercaderia) reg.getDatos();
+            if(encontrado.getTipo() == 'P') {
+                archTP.buscarRegistro(nroOrd);
+                reg = archTP.leerRegistro();
+                encontrado = (TransportePersonas) reg.getDatos();
+            }
+        } 
+
+        archTM.cerrarArchivo();
+        archTP.cerrarArchivo();
+        return encontrado;
     }
 
 } //end class
