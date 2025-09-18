@@ -1,6 +1,10 @@
 
 package empresatransporte.presentacion;
 
+/*ASIGNATURA: PROGRAMACION III
+  GRUPO 7: ROJAS MATIAS NICOLAS Y VILLALVA PEDRAZA LUCIANO NICOLAS
+*/
+
 import empresatransporte.MenuPrincipal;
 
 public class Principal {
