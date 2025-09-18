@@ -42,6 +42,11 @@ public class MenuPrincipal {
             Registro regT = new Registro(new TransporteMercaderia(), 0);
             archTM.crearArchivoVacio(regT);
         }
+        if (!fdCond.exists()) { // si no existe el archivo de transportes, lo crea
+            // para cualquiera de los dos tipos de transporte
+            Registro regC = new Registro(new Conductor(), 0);
+            archC.crearArchivoVacio(regC);
+        }
     }
 
     private void mostrarMenu() {

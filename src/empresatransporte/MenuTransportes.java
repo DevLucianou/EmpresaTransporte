@@ -189,7 +189,7 @@ public class MenuTransportes {
 
  private void modificarTransporte(){
         char opc = 'n';
-        Archivo arch;
+        Archivo arch = null;
         Registro reg;
         Transporte t;
        do{
@@ -220,6 +220,7 @@ public class MenuTransportes {
        }while(opc != 's');
         Registro regActualizado = new Registro(t, reg.getNroOrden());
         arch.grabarRegistro(regActualizado);
+        arch.cerrarArchivo();
     } //end modificarTransporte
  
     

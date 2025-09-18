@@ -50,7 +50,7 @@ public class Conductor implements Grabable {
         do {
             Consola.emitirMensaje("Ingrese el DNI del conductor: ");
             dni = Consola.leerInt();
-            if (dni <= 0 && dni >= 99999999) { // posiblemente a revisar
+            if (dni <= 0 || dni >= 99999999) { // posiblemente a revisar
                 Consola.emitirMensajeLN("ERROR. El DNI debe ser de 8 cifras");
             }
         } while (dni <= 0 && dni >= 99999999);
@@ -68,7 +68,7 @@ public class Conductor implements Grabable {
             if (nom.length() > TAM_APE_NOM) {
                 Consola.emitirMensajeLN("[ERROR] El nombre no puede superar los " + TAM_APE_NOM + " caracteres");
             }
-        } while (nom.isEmpty() && nom.length() > TAM_APE_NOM);
+        } while (nom.isEmpty() || nom.length() > TAM_APE_NOM);
         setApe_nom(nom);
 
     }
