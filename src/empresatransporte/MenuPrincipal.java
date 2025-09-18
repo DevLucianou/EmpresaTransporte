@@ -35,7 +35,10 @@ public class MenuPrincipal {
         File fdCond = archC.getFd();
         File fdTrans = archTM.getFd();
 
-        
+        if (!fdCond.exists()) { // si no existe el archivo de conductores, lo crea
+            Registro regT = new Registro(new Conductor(), 0);
+            archC.crearArchivoVacio(regT);
+        }
 
         if (!fdTrans.exists()) { // si no existe el archivo de transportes, lo crea
             // para cualquiera de los dos tipos de transporte
@@ -101,7 +104,7 @@ public class MenuPrincipal {
     }
 
     private void listarTransportesPorConductor() {
-        Consola.emitirMensajeLN("\n ----- Listar Transportes por Conductor -----\n");
+        Consola.emitirMensajeLN("\n\n----- Listar Transportes por Conductor -----\n\n");
         archC.abrirParaLectura();
 
         Conductor condTmp = new Conductor();
@@ -110,12 +113,13 @@ public class MenuPrincipal {
         Registro reg = archC.leerRegistro();
         if (reg.getEstado()) {
             Conductor cond = (Conductor) reg.getDatos();
+            System.out.println("");
             mostrarTransportesDeConductor(cond);
         } else {
             Consola.emitirMensajeLN("[ERROR] No existe un conductor con ese DNI.");
         }
         archC.cerrarArchivo();
-        Consola.emitirMensajeLN("\n---------------------------------------------\n");
+        Consola.emitirMensajeLN("\n\n---------------------------------------------\n\n");
     }
 
     private void mostrarTransportesDeConductor(Conductor cond) {
@@ -153,7 +157,7 @@ public class MenuPrincipal {
 
     private void listarSueldos() {
 
-         Consola.emitirMensajeLN("-- Listados de sueldos por conductor --");
+         Consola.emitirMensajeLN("\n\n----- Listar Sueldos de Conductores -----\n\n");
             archC.abrirParaLectura();
             archC.irPrincipioArchivo();
             boolean hayConductores = false;
@@ -177,6 +181,7 @@ public class MenuPrincipal {
                 Consola.emitirMensajeLN("No hay conductores registrados");
             }
             archC.cerrarArchivo();
+            Consola.emitirMensajeLN("\n\n-----------------------------------------\n\n");
     } //end listarSueldos
     
     /*Funcion que devuelve el calculo de el total de extras por cada transporte asociado al conductor*/
@@ -215,7 +220,6 @@ public class MenuPrincipal {
 
         boolean b = true;
         while (b) {
-            
             c.leerDni();
             archC.buscarRegistro(c.hashCode());
             Registro reg = archC.leerRegistro();
@@ -268,9 +272,6 @@ public class MenuPrincipal {
         Consola.emitirMensajeLN("\n\n--------------------------------\n\n");
     }
 
-    /*
-     * TEST - LISTAR TRANSPORTES
-     */
     private void listarTransportesActivos() {
         // Recorremos a partir de un archivo pero necesitamos los dos para obtener el
         // objeto correcto
