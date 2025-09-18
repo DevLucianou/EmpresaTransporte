@@ -1,3 +1,4 @@
+
 package empresatransporte;
 
 import datos.Conductor;
@@ -197,12 +198,10 @@ public class MenuTransportes {
 
  private void modificarTransporte(){
         Consola.emitirMensajeLN("\n\n--------------- MODIFICAR TRANSPORTE ---------------\n\n");
-        char opc = 'n';
+        char opc = 's';
         Archivo arch = null;
-<<<<<<< HEAD
-        Registro reg;
-=======
->>>>>>> e85d8d482ac16d6a1a24a6500b171e425db3f85b
+        Registro reg = null;
+
         Transporte t;
         Transporte tAux = new TransporteMercaderia();
        do{
@@ -242,23 +241,20 @@ public class MenuTransportes {
             }
             
         
-<<<<<<< HEAD
+
         Consola.emitirMensajeLN("Desea modificar otro registro? (s/n): ");
-       }while(opc != 's');
+        opc = Consola.leerChar();
+       }while(opc != 'n');
         Registro regActualizado = new Registro(t, reg.getNroOrden());
         arch.grabarRegistro(regActualizado);
         arch.cerrarArchivo();
-=======
+
 
             //Preguntar si desea modificar otro transporte
             Consola.emitirMensajeLN("Desea modificar otro transporte? (s/n): ");
             opc = Consola.leerChar();
-       }while(opc != 'n');
-       Consola.emitirMensajeLN("\n\n-----------------------------------------------\n\n");
->>>>>>> e85d8d482ac16d6a1a24a6500b171e425db3f85b
-    } //end modificarTransporte
- 
-    
+       }
+       
  
 private void modificarTransportePersonas(TransportePersonas t){
         Consola.emitirMensajeLN("\n--------------------------------------------");
@@ -371,4 +367,6 @@ private void modificarTransportePersonas(TransportePersonas t){
         return encontrado;
     }
 
+
 } //end class
+
