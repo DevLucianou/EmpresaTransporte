@@ -65,13 +65,13 @@ public abstract class Transporte implements Grabable, ICalculable {
     } // end leerCodeT
 
     public void leerHoras() {
-        Consola.emitirMensajeLN("Ingrese la cantidad de horas conducidas:  ");
+
         int horas;
         do {
+            Consola.emitirMensaje("Ingrese la cantidad de horas conducidas:  ");
             horas = Consola.leerInt();
             if (horas <= 0) {
-                Consola.emitirMensajeLN(
-                        "ERROR, la cantidad de horas conducidas no puede ser menor o igual que 0, ingrese de nuevo: ");
+                Consola.emitirMensajeLN("[ERROR] La cantidad de horas conducidas no puede ser menor o igual que 0");
             }
 
         } while (horas <= 0);
